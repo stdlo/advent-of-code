@@ -10,8 +10,6 @@ import (
 
 var inputStr string
 var length int
-var matchSlice = []int{}
-var sum int
 
 func init() {
 	if len(os.Args) > 1 {
@@ -25,6 +23,10 @@ func init() {
 
 func main() {
 	var inputArr = make([]int, length)
+	var sumSlice = []int{}
+	var sum int
+
+	// convert string to array
 	for i, r := range inputStr {
 		n, _ := strconv.Atoi(string(r))
 		inputArr[i] = n
@@ -32,31 +34,26 @@ func main() {
 
 	steps := length / 2
 
+	// loop array  to get matches into a slice
 	for i, n := range inputArr {
+
+		// setup index of array using steps
 		matchIndex := i + steps
 		if matchIndex > length-1 {
 			matchIndex = matchIndex - length
 		}
+
 		match := inputArr[matchIndex]
 
-		/*
-			fmt.Println("---->")
-			fmt.Println("i", i)
-			fmt.Println("n", n)
-			fmt.Println("matchIndex", matchIndex)
-			fmt.Printf("inputArr[%d] %d\n", matchIndex, inputArr[matchIndex])
-			fmt.Println("<----")
-		*/
-
+		// if good add to sumSlice
 		if n == match {
-			matchSlice = append(matchSlice, n)
+			sumSlice = append(sumSlice, n)
 		}
 	}
 
-	for _, n := range matchSlice {
+	// generate final sum by adding everything in the sumSlice
+	for _, n := range sumSlice {
 		sum += n
 	}
-	fmt.Println("steps =>", steps)
-
 	fmt.Println("sum =>", sum)
 }
