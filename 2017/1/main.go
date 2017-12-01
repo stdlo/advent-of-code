@@ -2,7 +2,7 @@ package main
 
 import "github.com/loganbickmore/advent-of-code/utils"
 
-func toIntArr(s string) []int {
+func arrAtoi(s string) []int {
 	var arr = make([]int, len(s))
 	for i, r := range s {
 		arr[i] = utils.Atoi(string(r))
@@ -22,7 +22,7 @@ func solve(arr []int, x int) int {
 }
 
 func main() {
-	var input = toIntArr(utils.GetInput())
+	var input = arrAtoi(utils.GetInput())
 	println("Part1 ->", solve(input, 1))
 	println("Part2 ->", solve(input, len(input)/2))
 }
