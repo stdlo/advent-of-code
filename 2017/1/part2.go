@@ -2,33 +2,24 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
-	"os"
-	"strconv"
-	"strings"
+
+	"github.com/loganbickmore/advent-of-code/utils"
 )
 
 var inputStr string
 var length int
 
-func init() {
-	if len(os.Args) > 1 {
-		inputStr = os.Args[1]
-	} else {
-		data, _ := ioutil.ReadFile("input")
-		inputStr = strings.TrimSuffix(string(data), "\n")
-	}
-	length = len(inputStr)
-}
-
 func main() {
+	inputStr = utils.GetInput()
+	length = len(inputStr)
+
 	var inputArr = make([]int, length)
 	var sumSlice = []int{}
 	var sum int
 
 	// convert string to array
 	for i, r := range inputStr {
-		n, _ := strconv.Atoi(string(r))
+		n := utils.Atoi(string(r))
 		inputArr[i] = n
 	}
 

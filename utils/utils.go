@@ -5,6 +5,7 @@ package utils
 import (
 	"io/ioutil"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -32,4 +33,18 @@ func GetInput() string {
 	}
 	data, _ := ioutil.ReadFile("input")
 	return strings.TrimSuffix(string(data), "\n")
+}
+
+// Itoa is a passthrough for strconv.Itoa
+func Itoa(i int) string {
+	return strconv.Itoa(i)
+}
+
+// Atoi is a passthrough for strconv.Atoi that panics upon failure.
+func Atoi(s string) int {
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		panic(err)
+	}
+	return i
 }
