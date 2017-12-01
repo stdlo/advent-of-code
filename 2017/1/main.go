@@ -10,22 +10,11 @@ func toIntArr(s string) []int {
 	return arr
 }
 
-func part1(arr []int) int {
+func solve(arr []int, x int) int {
 	var sum int
 	list := append(arr, arr...)
 	for i, n := range arr {
-		if n == list[i+1] {
-			sum += n
-		}
-	}
-	return sum
-}
-
-func part2(arr []int) int {
-	var sum int
-	list := append(arr, arr...)
-	for i, n := range arr {
-		if n == list[i+len(arr)/2] {
+		if n == list[i+x] {
 			sum += n
 		}
 	}
@@ -34,6 +23,6 @@ func part2(arr []int) int {
 
 func main() {
 	var input = toIntArr(utils.GetInput())
-	println("Part1 ->", part1(input))
-	println("Part2 ->", part2(input))
+	println("Part1 ->", solve(input, 1))
+	println("Part2 ->", solve(input, len(input)/2))
 }
