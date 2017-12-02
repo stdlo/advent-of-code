@@ -5,8 +5,8 @@ package utils
 import (
 	"io/ioutil"
 	"os"
+	"regexp"
 	"strconv"
-	"strings"
 )
 
 // Abs returns the absolute value of x.
@@ -32,7 +32,8 @@ func GetInput() string {
 		return os.Args[1]
 	}
 	data, _ := ioutil.ReadFile("input")
-	return strings.TrimSuffix(string(data), "\n")
+	re := regexp.MustCompile(`\r?\n`)
+	return re.ReplaceAllString(string(data), "")
 }
 
 // Itoa is a passthrough for strconv.Itoa
