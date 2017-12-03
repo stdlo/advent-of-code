@@ -25,6 +25,13 @@ func Max(x, y int) int {
 	return y
 }
 
+func Min(x, y int) int {
+	if x > y {
+		return y
+	}
+	return x
+}
+
 // GetInput will return a string from the first
 // argument passed, or from the file "./input"
 func GetInput() string {
