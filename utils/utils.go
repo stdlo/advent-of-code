@@ -17,6 +17,12 @@ func Abs(x int) int {
 	return x
 }
 
+// Dist returns the distance between two points on a matrix
+// https://stackoverflow.com/a/15179572
+func Dist(a, b []int) int {
+	return Abs(a[0]-b[0]) + Abs(a[1]-b[1])
+}
+
 // Max returns the greater value between x and y.
 func Max(x, y int) int {
 	if x > y {
@@ -25,6 +31,7 @@ func Max(x, y int) int {
 	return y
 }
 
+// Min returns the lesser value between x and y.
 func Min(x, y int) int {
 	if x > y {
 		return y
