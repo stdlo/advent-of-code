@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/loganbickmore/advent-of-code/utils"
@@ -52,6 +53,9 @@ func getCoords(m [][]int, t int) ([]int, []int) {
 }
 
 func main() {
+	// part 2
+	p2()
+	return
 	m := genMatrix(530) //530x530 contains the target of input
 	tar, cen := getCoords(m, input)
 	fmt.Println("Testcases")
@@ -61,4 +65,113 @@ func main() {
 	fmt.Println("1024: expect 31 ->", utils.Dist(getCoords(m, 1024)))
 
 	fmt.Println("Part1 ->", utils.Dist(tar, cen))
+}
+
+type l struct {
+	x int
+	y int
+}
+type data map[l]int
+
+func sum(input ...int) int {
+	sum := 0
+	for i := range input {
+		sum += input[i]
+	}
+	return sum
+}
+func (d data) gen(lx, ly int) int {
+	n := sum(
+		d[l{lx - 1, ly + 1}], // [-1, 1]
+		d[l{lx, ly + 1}],     // [ 0, 1]
+		d[l{lx + 1, ly + 1}], // [ 1, 1]
+		d[l{lx - 1, ly}],     // [-1, 0]
+		d[l{lx + 1, ly}],     // [ 1, 0]
+		d[l{lx - 1, ly - 1}], // [-1,-1]
+		d[l{lx, ly - 1}],     // [ 0,-1]
+		d[l{lx + 1, ly - 1}], // [ 1,-1]
+	)
+	d[l{lx, ly}] = n
+	if lx == 2 && ly == -1 {
+		fmt.Println(2, -1, "=>", n)
+	}
+	return n
+}
+
+func p2() {
+	d := make(data)
+	d[l{0, 0}] = 1
+	/*
+		d.gen(1, 0)
+		d.gen(1, 1)
+		d.gen(0, 1)
+		d.gen(-1, 1)
+		d.gen(-1, 0)
+		d.gen(-1, -1)
+		d.gen(0, -1)
+		d.gen(1, -1)
+		lx := 2
+		ly := -1
+		fmt.Println(d.gen(lx, ly))
+		fmt.Printf("%#v", d)
+	*/
+	lx := 1
+	ly := 0
+	for i := 0; i < 5; i++ {
+		// right
+		// if up is 0 go up
+		for {
+			up := d[l{lx, ly + 1}]
+			if up == 0 {
+				d.goUp(lx, ly)
+			} else {
+				lx++
+				d.gen(lx, ly)
+			}
+		}
+
+		// up
+		// if left is 0 go left
+		for {
+			left := d[l{lx - 1, ly}]
+			if left == 0 {
+				break
+			} else {
+				ly++
+				d.gen(lx, ly)
+			}
+		}
+
+		// left
+		// if down is 0 go down
+		for {
+			down := d[l{lx, ly - 1}]
+			if down == 0 {
+				break
+			} else {
+				lx--
+				d.gen(lx, ly)
+			}
+		}
+
+		// down
+		// if right is 0 go right
+		for {
+			right := d[l{lx + 1, ly}]
+			if right == 0 {
+				break
+			} else {
+				ly--
+				d.gen(lx, ly)
+			}
+		}
+		j, _ := json.Marshal(d)
+		fmt.Println(j)
+
+		/*
+			[-1, 1], [0, 1], [1, 1]
+			[-1, 0], [0, 0], [1, 0]
+			[-1,-1], [0,-1], [1,-1]
+		*/
+	}
 }
