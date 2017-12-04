@@ -8,6 +8,7 @@ import (
 )
 
 var input = 277678
+var end = 3
 
 // genMatrix creates a matrix n*n in size and accepts a target number
 // returns a 2d slice in a spiral format, target coords and center coords
@@ -98,6 +99,58 @@ func (d data) gen(lx, ly int) int {
 	return n
 }
 
+func (d data) goUp(lx, ly int) {
+	// up
+	// if left is 0 go left
+	for {
+		left := d[l{lx - 1, ly}]
+		if left == 0 {
+			d.goLeft(lx, ly)
+		} else {
+			ly++
+			d.gen(lx, ly)
+		}
+	}
+}
+func (d data) goDown(lx, ly int) {
+	// down
+	// if right is 0 go right
+	for {
+		right := d[l{lx + 1, ly}]
+		if right == 0 {
+			d.goRight(lx, ly)
+		} else {
+			ly--
+			d.gen(lx, ly)
+		}
+	}
+}
+func (d data) goLeft(lx, ly int) {
+	// left
+	// if down is 0 go down
+	for {
+		down := d[l{lx, ly - 1}]
+		if down == 0 {
+			d.goDown(lx, ly)
+		} else {
+			lx--
+			d.gen(lx, ly)
+		}
+	}
+}
+func (d data) goRight(lx, ly int) {
+	if lx == end { // end once lx hits defined end to break
+		return
+	}
+	up := d[l{lx, ly + 1}]
+	if up == 0 {
+		d.goUp(lx, ly)
+	}
+	lx++
+	d.gen(lx, ly)
+	d.goRight(lx, ly)
+}
+
 func p2() {
 	d := make(data)
 	d[l{0, 0}] = 1
@@ -118,53 +171,7 @@ func p2() {
 	lx := 1
 	ly := 0
 	for i := 0; i < 5; i++ {
-		// right
-		// if up is 0 go up
-		for {
-			up := d[l{lx, ly + 1}]
-			if up == 0 {
-				d.goUp(lx, ly)
-			} else {
-				lx++
-				d.gen(lx, ly)
-			}
-		}
-
-		// up
-		// if left is 0 go left
-		for {
-			left := d[l{lx - 1, ly}]
-			if left == 0 {
-				break
-			} else {
-				ly++
-				d.gen(lx, ly)
-			}
-		}
-
-		// left
-		// if down is 0 go down
-		for {
-			down := d[l{lx, ly - 1}]
-			if down == 0 {
-				break
-			} else {
-				lx--
-				d.gen(lx, ly)
-			}
-		}
-
-		// down
-		// if right is 0 go right
-		for {
-			right := d[l{lx + 1, ly}]
-			if right == 0 {
-				break
-			} else {
-				ly--
-				d.gen(lx, ly)
-			}
-		}
+		d.goRight(lx, ly)
 		j, _ := json.Marshal(d)
 		fmt.Println(j)
 
