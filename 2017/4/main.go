@@ -1,16 +1,15 @@
 package main
 
 import (
-	"fmt"
+	"sort"
 	"strings"
-	"unicode/utf8"
 )
 
 func main() {
 	sum := 0
 	for _, phrase := range input {
 		pSlice := strings.Fields(phrase)
-		if valid(pSlice) {
+		if p1(pSlice) {
 			sum++
 		}
 	}
@@ -18,17 +17,17 @@ func main() {
 
 	sum = 0
 	for _, phrase := range input {
-		pSlice := strings.Fields(phrase)
-		if valid2(pSlice) {
+		splitPhrase := strings.Fields(phrase)
+		if p2(splitPhrase) {
 			sum++
 		}
 	}
 	println("part2 ->", sum)
 
 }
-func valid(s []string) bool {
-	e := map[string]bool{}
 
+func p1(s []string) bool {
+	e := map[string]bool{}
 	for v := range s {
 		if e[s[v]] == true {
 			return false
@@ -38,26 +37,39 @@ func valid(s []string) bool {
 	return true
 }
 
-func valid2(s []string) bool {
+func p2(s []string) bool {
 	e := map[string]bool{}
-
 	for v := range s {
-		bs := []byte(s[v])
-
-		var rs string
-		for len(bs) > 0 {
-			r, size := utf8.DecodeLastRune(bs)
-			rs += fmt.Sprintf("%c", r)
-			bs = bs[:len(bs)-size]
-		}
-		e[rs] = true
-		if e[s[v]] == true {
+		slc := StrToChars(s[v])
+		sort.Strings(slc)
+		str := strings.Join(slc, "")
+		if e[str] == true {
 			return false
 		}
-		e[s[v]] = true
-
+		e[str] = true
 	}
 	return true
+}
+
+// StrToChars converts a string to a slice of chars
+func StrToChars(s string) []string {
+	var ss []string
+	for _, b := range s {
+		ss = append(ss, string(b))
+	}
+	return ss
+}
+
+// check for equality
+func StrEqual(a, b string) bool {
+	var as = StrToChars(a)
+	var bs = StrToChars(b)
+	sort.Strings(as)
+	sort.Strings(bs)
+	if strings.Join(as, "") == strings.Join(bs, "") {
+		return true
+	}
+	return false
 }
 
 var input = []string{"sayndz zfxlkl attjtww cti sokkmty brx fhh suelqbp",
