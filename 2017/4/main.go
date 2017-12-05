@@ -1,6 +1,10 @@
 package main
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+	"unicode/utf8"
+)
 
 func main() {
 	sum := 0
@@ -10,7 +14,17 @@ func main() {
 			sum++
 		}
 	}
-	println(sum)
+	println("part1 ->", sum)
+
+	sum = 0
+	for _, phrase := range input {
+		pSlice := strings.Fields(phrase)
+		if valid2(pSlice) {
+			sum++
+		}
+	}
+	println("part2 ->", sum)
+
 }
 func valid(s []string) bool {
 	e := map[string]bool{}
@@ -20,6 +34,28 @@ func valid(s []string) bool {
 			return false
 		}
 		e[s[v]] = true
+	}
+	return true
+}
+
+func valid2(s []string) bool {
+	e := map[string]bool{}
+
+	for v := range s {
+		bs := []byte(s[v])
+
+		var rs string
+		for len(bs) > 0 {
+			r, size := utf8.DecodeLastRune(bs)
+			rs += fmt.Sprintf("%c", r)
+			bs = bs[:len(bs)-size]
+		}
+		e[rs] = true
+		if e[s[v]] == true {
+			return false
+		}
+		e[s[v]] = true
+
 	}
 	return true
 }
