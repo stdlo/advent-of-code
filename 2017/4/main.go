@@ -5,44 +5,33 @@ import (
 	"strings"
 )
 
+const part1 = 1
+const part2 = 2
+
 func main() {
+	println("part1 ->", solve(part1))
+	println("part2 ->", solve(part2))
+}
+
+func solve(part int) int {
 	sum := 0
 	for _, phrase := range input {
-		pSlice := strings.Fields(phrase)
-		if p1(pSlice) {
-			sum++
-		}
-	}
-	println("part1 ->", sum)
-
-	sum = 0
-	for _, phrase := range input {
 		splitPhrase := strings.Fields(phrase)
-		if p2(splitPhrase) {
+		if isValidPass(splitPhrase, part) {
 			sum++
 		}
 	}
-	println("part2 ->", sum)
-
+	return sum
 }
 
-func p1(s []string) bool {
+func isValidPass(s []string, part int) bool {
 	e := map[string]bool{}
-	for v := range s {
-		if e[s[v]] == true {
-			return false
+	for _, str := range s {
+		if part == part2 {
+			slc := strToChars(str)
+			sort.Strings(slc)
+			str = strings.Join(slc, "")
 		}
-		e[s[v]] = true
-	}
-	return true
-}
-
-func p2(s []string) bool {
-	e := map[string]bool{}
-	for v := range s {
-		slc := StrToChars(s[v])
-		sort.Strings(slc)
-		str := strings.Join(slc, "")
 		if e[str] == true {
 			return false
 		}
@@ -52,24 +41,12 @@ func p2(s []string) bool {
 }
 
 // StrToChars converts a string to a slice of chars
-func StrToChars(s string) []string {
+func strToChars(s string) []string {
 	var ss []string
 	for _, b := range s {
 		ss = append(ss, string(b))
 	}
 	return ss
-}
-
-// check for equality
-func StrEqual(a, b string) bool {
-	var as = StrToChars(a)
-	var bs = StrToChars(b)
-	sort.Strings(as)
-	sort.Strings(bs)
-	if strings.Join(as, "") == strings.Join(bs, "") {
-		return true
-	}
-	return false
 }
 
 var input = []string{"sayndz zfxlkl attjtww cti sokkmty brx fhh suelqbp",
