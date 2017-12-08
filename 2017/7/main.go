@@ -24,7 +24,7 @@ type Program struct {
 }
 
 func main() {
-	data = parse(test) // get tower data type
+	data = parse(in) // get tower data type
 
 	disqualified := []string{}
 	for k, v := range data {
@@ -39,45 +39,56 @@ func main() {
 
 	bottom := check()
 
-	// IDEA:
-	paths := []int
-	for _, v := range data[bottom].above{
-		// recursive function here
-		paths = append(paths, recursiveReturnValue)
+	// part 2
+	for _, v := range data[bottom].above {
+		res := r(v, Data{})
+		lists = append(lists, res)
 	}
-	// -------
-	fmt.Println(bottom)
-	fmt.Println(r(bottom, bottom, 0))
-	for _, v := range list[0] {
-		fmt.Println(v.name, v.weight)
-	}
-}
 
-var list = [][]Program{}
-var short = []Program{}
+	last := 0
+	for i, m := range lists {
+		sum := 0
+		for k, v := range m {
+			if i == 1 {
+				fmt.Println(i, "->", k, v)
+			}
 
-func r(origin, current string, sum int) int {
-	//weights = append(weights, data[current].weight)
-	sum += data[current].weight
-	short = append(short, data[current])
-	// origin holds a, b , c
-	// sum of a = ???
-
-	if data[current].disc { // holding programs
-		for _, p := range data[current].above {
-			//if current == origin {
-			//	fmt.Println(p, data[p].weight)
-			//}
-			sum = r(origin, p, sum)
-			list = append(list, short)
-			short = []Program{}
-
+			sum += v
 		}
 
+		if sum != last {
+			fmt.Println(i, "total", sum)
+		}
+		last = sum
 	}
 
-	return sum //r(program)
+	// TREE index 1 has a problem
 }
+
+func part2() {
+
+}
+
+type Data map[string]int
+type Datas []Data
+
+var lists = Datas{}
+
+func r(p string, list Data) Data {
+	list[p] = data[p].weight
+	//list = append(list, data[p])
+	if data[p].disc { // holding programs
+		for _, p := range data[p].above {
+			res := r(p, list)
+			for k, v := range res {
+				list[k] = v
+				//list = append(list, pp)
+			}
+		}
+	}
+	return list
+}
+
 func check() string { // can = 1 dis =2
 	e := map[string]int{}
 	for _, str := range c {
