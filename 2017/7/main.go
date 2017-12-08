@@ -8,66 +8,24 @@ import (
 	"github.com/loganbickmore/advent-of-code/utils"
 )
 
-type tower map[string]node
-type node struct {
-	weight int
-	above  []string
-}
-
 var (
-	test = `pbga (66)
-xhth (57)
-ebii (61)
-havc (66)
-ktlj (57)
-fwft (72) -> ktlj, cntj, xhth
-qoyq (66)
-padx (45) -> pbga, havc, qoyq
-tknk (41) -> ugml, padx, fwft
-jptl (61)
-ugml (68) -> gyxo, ebii, jptl
-gyxo (61)
-cntj (57)`
 	input = 0
 	d     = []string{}
 	c     = []string{}
 	data  = tower{}
 )
 
-func parse(data string) tower {
-	out := make(tower)
-	slc := strings.Split(data, "\n")
-	for _, s := range slc {
-		// parse out beginning
-		r, _ := regexp.Compile("^[a-z]+ ")
-		name := r.FindString(s)
-		name = strings.Join(strings.Fields(name), "")
-
-		// parse out (\d\d)
-		r, _ = regexp.Compile("([0-9]+)")
-		weight := r.FindString(s)
-
-		// parse out -> // everthing after -> is part of "above"
-		r, _ = regexp.Compile(" -> (.*)")
-		after := r.FindString(s)
-		above := []string{}
-		if len(after) > 0 {
-			above = strings.SplitN(strings.SplitAfter(after, "-> ")[1], ", ", -1)
-			for _, s := range above {
-				d = append(d, s)
-			}
-		}
-		out[name] = node{
-			weight: utils.Atoi(weight),
-			above:  above,
-		}
-
-	}
-	return out
+type tower map[string]Program
+type Program struct {
+	name   string
+	weight int
+	above  []string
+	disc   bool
 }
-func main() {
 
-	data = parse(in)
+func main() {
+	data = parse(test) // get tower data type
+
 	disqualified := []string{}
 	for k, v := range data {
 		if len(v.above) == 0 {
@@ -79,17 +37,47 @@ func main() {
 		}
 	}
 
-	fmt.Println(check())
-}
-func isValueInList(value string, list []string) bool {
-	for _, v := range list {
-		if v == value {
-			return true
-		}
+	bottom := check()
+
+	// IDEA:
+	paths := []int
+	for _, v := range data[bottom].above{
+		// recursive function here
+		paths = append(paths, recursiveReturnValue)
 	}
-	return false
+	// -------
+	fmt.Println(bottom)
+	fmt.Println(r(bottom, bottom, 0))
+	for _, v := range list[0] {
+		fmt.Println(v.name, v.weight)
+	}
 }
 
+var list = [][]Program{}
+var short = []Program{}
+
+func r(origin, current string, sum int) int {
+	//weights = append(weights, data[current].weight)
+	sum += data[current].weight
+	short = append(short, data[current])
+	// origin holds a, b , c
+	// sum of a = ???
+
+	if data[current].disc { // holding programs
+		for _, p := range data[current].above {
+			//if current == origin {
+			//	fmt.Println(p, data[p].weight)
+			//}
+			sum = r(origin, p, sum)
+			list = append(list, short)
+			short = []Program{}
+
+		}
+
+	}
+
+	return sum //r(program)
+}
 func check() string { // can = 1 dis =2
 	e := map[string]int{}
 	for _, str := range c {
@@ -116,6 +104,63 @@ func check() string { // can = 1 dis =2
 	return ""
 }
 
+func parse(data string) tower {
+	out := make(tower)
+	slc := strings.Split(data, "\n")
+	for _, s := range slc {
+		// parse out beginning
+		r, _ := regexp.Compile("^[a-z]+")
+		name := r.FindString(s)
+		//name = strings.Join(strings.Fields(name), "")
+
+		// parse out (\d\d)
+		r, _ = regexp.Compile("([0-9]+)")
+		weight := r.FindString(s)
+
+		// parse out -> // everthing after -> is part of "above"
+		r, _ = regexp.Compile(" -> (.*)")
+		after := r.FindString(s)
+		above := []string{}
+		disc := false
+		if len(after) > 0 {
+			disc = true
+			above = strings.SplitN(strings.SplitAfter(after, "-> ")[1], ", ", -1)
+			for _, s := range above {
+				d = append(d, s)
+			}
+		}
+		out[name] = Program{
+			name:   name,
+			weight: utils.Atoi(weight),
+			above:  above,
+			disc:   disc,
+		}
+	}
+	return out
+}
+
+func isValueInList(value string, list []string) bool {
+	for _, v := range list {
+		if v == value {
+			return true
+		}
+	}
+	return false
+}
+
+var test = `pbga (66)
+xhth (57)
+ebii (61)
+havc (66)
+ktlj (57)
+fwft (72) -> ktlj, cntj, xhth
+qoyq (66)
+padx (45) -> pbga, havc, qoyq
+tknk (41) -> ugml, padx, fwft
+jptl (61)
+ugml (68) -> gyxo, ebii, jptl
+gyxo (61)
+cntj (57)`
 var in = `uglvj (99) -> ymfjt, gkpgf
 vvwrg (51)
 qrpgt (5)
