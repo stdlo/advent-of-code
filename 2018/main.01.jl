@@ -1,4 +1,5 @@
 #! /usr/bin/env julia
+using Test
 
 # return array of data split on newlines from file path
 function load_data(file_path)
@@ -20,13 +21,16 @@ function calc(freq,changes)
   calc(freq + to_int(changes[1]), changes[2:len])
 end
 
-file_path = try ARGS[1] catch; "input.01.txt" end
-data = load_data(file_path)
-test_data = [["+1", "-2", "+3", "+1"],[+1, +1, +1],[+1, +1, -2],[-1, -2, -3]]
-
-println("Test data:")
-for data in test_data
-  println(data, " => ", calc(0,data))
+# [test_data, expected_result]
+test_cases = [[["+1", "-2", "+3", "+1"], 3],
+              [[+1, +1, +1], 3],
+              [[+1, +1, -2], 0],
+              [[-1, -2, -3], -6]]
+for case in test_cases
+  @test calc(0,case[1]) == case[2]
 end
 
-println(file_path, " => ", calc(0,data))
+file_path = try ARGS[1] catch; "input.01.txt" end
+data = load_data(file_path)
+
+println(calc(0,data))
