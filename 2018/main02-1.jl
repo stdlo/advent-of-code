@@ -1,6 +1,6 @@
 #! /usr/bin/env julia
 using Test
-include("../utils.jl"); using ..Utils
+include("../utils.jl")
 
 pick2and3 = partial(filter, x-> !(x<2 || x>3))
 function inc_occr(list, d = Dict()) foreach(a->haskey(d,a) ? d[a] += 1 : d[a] = 1, list); return d end
@@ -24,7 +24,7 @@ test_case = [["abcdef","bababc","abbcde","abcccd","aabcdd","abcdee","ababab"], 1
 @test solve_v1(test_case[1]) == test_case[2]
 @test solve_v2(test_case[1]) == test_case[2]
 
-file_path = try ARGS[1] catch; "input.02.txt" end
+file_path = try ARGS[1] catch; "inputs/02-1" end
 data = read_file_lines(file_path)
 println(solve_v2(data))
 
