@@ -2,29 +2,40 @@
 using Test
 include("../utils.jl")
 
-pick2and3 = partial(filter, x-> !(x<2 || x>3))
-function inc_occr(list, d = Dict()) foreach(a->haskey(d,a) ? d[a] += 1 : d[a] = 1, list); return d end
+get_indexes = (p,i) -> [p[i+1]+1,p[i+2]+1,p[i+3]+1]
 
-function solve_v1(arr, d = Dict())
-  len = length(arr)
-  return  len == 0 ?
-  reduce(*, values(d)) :
-  solve_v1(arr[2:len],
-          inc_occr(pick2and3(unique(values(inc_occr(arr[1])))), d))
+function apply_opcode(p, i) 
+  a,b,o = get_indexes(p,i)
+  if p[i] == 1
+    p[o] = p[a] + p[b]
+  elseif p[i] == 2
+    p[o] = p[a] * p[b]
+  else 
+    throw("opcode not 1 or 2")
+  end
+  return p
 end
 
-solve_v2 = list -> (map(pick2and3 ∘ unique ∘ values ∘ inc_occr, list) 
-                 |> flatten 
-                 |> inc_occr 
-                 |> values 
-                 |> partial(reduce, *)
-                )
+function solve(p, i = 1)
+ return p[i] == 99 ? p : solve(apply_opcode(p,i), i + 4)
+end
 
-test_case = [["abcdef","bababc","abbcde","abcccd","aabcdd","abcdee","ababab"], 12]
-@test solve_v1(test_case[1]) == test_case[2]
-@test solve_v2(test_case[1]) == test_case[2]
+test_cases = [
+  [[1,0,0,0,99], [2,0,0,0,99]],
+  [[2,3,0,3,99], [2,3,0,6,99]],
+  [[2,4,4,5,99,0], [2,4,4,5,99,9801]],
+  [[1,1,1,4,99,5,6,0,99], [30,1,1,4,2,5,6,0,99]],
+  ]
+
+for case in test_cases
+  @test solve(case[1]) == case[2]
+end
 
 file_path = try ARGS[1] catch; "inputs/02-1" end
-data = read_file_lines(file_path)
-println(solve_v2(data))
+data = map(a->parse(Int,a), split(read_file_slurp(file_path), ","))
+# "Reset" values
+data[2] = 12
+data[3] = 2
+
+println(solve(data)[1])
 
