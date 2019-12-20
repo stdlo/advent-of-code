@@ -1,95 +1,64 @@
 #! /usr/bin/env julia
 using Test
 include("../utils.jl")
-function step(current,x_or_y,n,direction,coords)
-  for i in 1:n
-    current[x_or_y] = direction(1,current[x_or_y])
-    coords=vcat(coords,[copy(current)])
-    println(current)
+
+function step(vertex, axis, distance, direction)
+  vertices=[]
+  for i in 1:distance
+    vertex[axis] = direction(vertex[axis],1)
+    vertices = vcat(vertices,[copy(vertex)])
   end
-  return current,coords
+  return vertices
 end
+
 function plot(path)
-  path = map( a -> split(a,""), path)
   current=[0,0]
   coords = [copy(current)]
   for a in path
-    n = parse(Int,a[2])
+    num = parse(Int,a[2:length(a)])
+    dir = a[1]
     # X Axis
-    if a[1] == "L"
-      current,coords=step(current,1,n,-,coords)
-    elseif a[1] == "R"
-      current,coords=step(current,1,n,+,coords)
+    if dir == 'L'
+      coords = vcat(coords, step(current,1,num,-))
+    elseif dir == 'R'
+      coords = vcat(coords, step(current,1,num,+))
     # Y Axis
-    elseif a[1] == "U"
-      current,coords=step(current,2,n,+,coords)
-    elseif a[1] == "D"
-      current,coords=step(current,2,n,-,coords)
+    elseif dir == 'U'
+      coords = vcat(coords, step(current,2,num,+))
+    elseif dir == 'D'
+      coords = vcat(coords, step(current,2,num,-))
     end
   end
   return coords
-end
-# Take current and last coords and determine if an intersection occurred
-function determine_intersection(current_a, current_b, prev_a, prev_b)
-    # if last coord flip flopped high/low then an intersection occured at the new high
-    # println("---")
-    # println("current_a,b  : ", current_a, current_b)
-    # println("prev_a,b     : ", prev_a, prev_b)
-
-
-    # println("current_b  : ", current_b)
-    # println("prev_b     : ", prev_b)
-    current_lesser_a = current_a[1] >= current_a[2]  ? 2 : 1
-    current_lesser_b = current_b[1] >= current_b[2]  ? 2 : 1
-    prev_lesser_a = prev_a[1] >= prev_a[2]  ? 2 : 1
-    prev_lesser_b = prev_b[1] >= prev_b[2]  ? 2 : 1
-    # println("a => ", current_greater_a)
-    # println("b => ", current_greater_b)
-    println(current_a,current_b, current_lesser_a == prev_lesser_a, current_lesser_b == prev_lesser_b)
-    if current_lesser_a == prev_lesser_a && current_lesser_b == prev_lesser_b
-      println("INTERSECT ", current_lesser_a => current_a[current_lesser_a], current_lesser_b => current_b[current_lesser_b])
-    end
-    println("---")
-
-
 end
 
 function solve(wires)
   wa = plot(split(wires[1],","))
   wb = plot(split(wires[2],","))
-  final=[]
-  # println(wa)
-  # println(wb)
-  for point in wa
-    for pointb in wb
-    # println(point,pointb)
-      if point == pointb
-        # println(point,pointb)
-        # final = vcat(final,point)
-      end
+  # take a vertex and add it together then abs it to get the manhattan distance
+  # also abs both points and get the mean to find which point is actually closest to 0,0
+  intersections = map(a->(abs(a[1]+a[2]),(abs(a[1])+abs(a[2]))/2), intersect(wa,wb)[2:end])
+
+  # loop over intersections and get the lowest abs mean from intersections
+  mdist=intersections[1]
+  for v in intersections
+    if mdist[2] > v[2]
+      mdist=v
     end
-    # final = vcat(final,filter(a->a==point,wb))
   end
-  # println(final)
-  # println(wa)
-  # return 0
-  larger_length = max(length(wa),length(wb))
-  for i in 1:larger_length
-    # println(wa[i],wb[i])
-  #   if wa[i] == [0,0]; continue end
-  #   determine_intersection(wa[i], wb[i], wa[i-1], wb[i-1])
-  end
+  return mdist[1]
 end
+
 test_cases = [
-  [["R8,U5,L5,D3", "U7,R6,D4,L4"], 6],
+  [["R8,U5,L5,D3",                                "U7,R6,D4,L4"],                         6],
+  [["R75,D30,R83,U83,L12,D49,R71,U7,L72",         "U62,R66,U55,R34,D71,R55,D58,R83"],     159],
+  [["R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51","U98,R91,D20,R16,D67,R40,U7,R15,U6,R7"],135],
   ]
 
 for case in test_cases
   @test solve(case[1]) == case[2]
 end
 
-# file_path = try ARGS[1] catch; "inputs/03-1" end
-# data = map(a->parse(Int,a), split(read_file_slurp(file_path), ","))
-# higher than [250]
-# lower than [376,500]
-# unknown [312]
+file_path = try ARGS[1] catch; "inputs/03-1" end
+data = read_file_lines(file_path)
+println(solve(data))
