@@ -1,23 +1,31 @@
 #! /usr/bin/env julia
 using Test
 include("../utils.jl")
+function step(current,x_or_y,n,direction,coords)
+  for i in 1:n
+    current[x_or_y] = direction(1,current[x_or_y])
+    coords=vcat(coords,[copy(current)])
+    println(current)
+  end
+  return current,coords
+end
 function plot(path)
   path = map( a -> split(a,""), path)
   current=[0,0]
   coords = [copy(current)]
   for a in path
+    n = parse(Int,a[2])
     # X Axis
-    if a[1] == "R"
-      current[1] += parse(Int,a[2])
-    elseif a[1] == "L"
-      current[1] -= parse(Int,a[2])
+    if a[1] == "L"
+      current,coords=step(current,1,n,-,coords)
+    elseif a[1] == "R"
+      current,coords=step(current,1,n,+,coords)
     # Y Axis
     elseif a[1] == "U"
-      current[2] += parse(Int,a[2])
+      current,coords=step(current,2,n,+,coords)
     elseif a[1] == "D"
-      current[2] -= parse(Int,a[2])
+      current,coords=step(current,2,n,-,coords)
     end
-    coords=vcat(coords,[copy(current)])
   end
   return coords
 end
@@ -49,11 +57,27 @@ end
 function solve(wires)
   wa = plot(split(wires[1],","))
   wb = plot(split(wires[2],","))
+  final=[]
+  # println(wa)
+  # println(wb)
+  for point in wa
+    for pointb in wb
+    # println(point,pointb)
+      if point == pointb
+        # println(point,pointb)
+        # final = vcat(final,point)
+      end
+    end
+    # final = vcat(final,filter(a->a==point,wb))
+  end
+  # println(final)
+  # println(wa)
+  # return 0
   larger_length = max(length(wa),length(wb))
   for i in 1:larger_length
-    println(wa[i],wb[i])
-    if wa[i] == [0,0]; continue end
-    determine_intersection(wa[i], wb[i], wa[i-1], wb[i-1])
+    # println(wa[i],wb[i])
+  #   if wa[i] == [0,0]; continue end
+  #   determine_intersection(wa[i], wb[i], wa[i-1], wb[i-1])
   end
 end
 test_cases = [
@@ -66,3 +90,6 @@ end
 
 # file_path = try ARGS[1] catch; "inputs/03-1" end
 # data = map(a->parse(Int,a), split(read_file_slurp(file_path), ","))
+# higher than [250]
+# lower than [376,500]
+# unknown [312]
