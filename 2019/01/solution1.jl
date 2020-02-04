@@ -12,6 +12,7 @@ test_cases = [["12", 2],
               [100756, 33583]]
 
 fuel_required(mass) = (to_int(mass) / 3 |> floor |> Int) - 2
+# static int FuelRequired(int mass) { return mass / 3 - 2; }
 for case in test_cases
   @test fuel_required(case[1]) == case[2]
 end
